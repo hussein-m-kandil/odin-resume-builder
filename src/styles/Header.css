@@ -1,0 +1,17 @@
+.header {
+  position: sticky;
+  color: var(--light-color);
+  background-color: var(--accent-color);
+}
+
+.header-content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-title {
+  margin: 0;
+}
