@@ -9,9 +9,8 @@
   aspect-ratio: 3/2;
   font-size: medium;
   font-weight: bold;
-  color: var(--dark-color);
-  background-color: var(--light-color);
-  transition: transform 150ms, filter 50ms;
+  transition: transform 150ms;
+  box-shadow: 0 0 5px 0 #0003;
 }
 
 .btn:hover {
@@ -19,8 +18,7 @@
 }
 
 .btn:focus {
-  outline: 2px solid var(--dark-color);
-  box-shadow: 0 0 5px 0 var(--shadow-color);
+  outline: 2px solid #000;
 }
 
 .btn:active {
