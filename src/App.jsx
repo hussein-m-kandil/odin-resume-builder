@@ -1,6 +1,4 @@
 import { Fragment, useState } from "react";
-import Header from "./components/Header";
-import Button from "./components/Button";
 import { initialData } from "./data/initialData";
 
 function Select({ options, ...props }) {
@@ -8,20 +6,53 @@ function Select({ options, ...props }) {
     <select {...props}>
       {options.map((o, i) => (
         <option key={o} value={i} style={props.style}>
-          {o.toUpperCase()}
+          {o}
         </option>
       ))}
     </select>
   );
 }
 
-function StyleController({
+function Checkbox({
   id,
-  fontSizeValue,
-  onChangeFontSize,
-  colorValue,
-  onChangeColor,
+  labelText,
+  labelStyle,
+  checkboxStyle,
+  checked,
+  onChange,
+  checkboxBeforeLabel = true,
 }) {
+  return (
+    <label htmlFor={id} style={labelStyle}>
+      {!checkboxBeforeLabel && labelText}
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        style={checkboxStyle}
+      />
+      {checkboxBeforeLabel && labelText}
+    </label>
+  );
+}
+
+function StyleController({ id, styleObject, onStyleChange }) {
+  const FONT_FAMILIES = [
+    "sans-serif",
+    "Arial",
+    "Helvetica",
+    "Verdana",
+    "serif",
+    "Tahoma",
+    "Trebuchet MS",
+    "Times New Roman",
+    "Georgia",
+    "Garamond",
+    "monospace",
+    "Courier New",
+    "cursive",
+  ];
   const FONT_SIZES = [
     "xx-small",
     "x-small",
@@ -31,34 +62,105 @@ function StyleController({
     "x-large",
     "xx-large",
   ];
-  const defaultFontSize = FONT_SIZES.indexOf(fontSizeValue ?? "medium");
+  const defaultFontFamily = FONT_FAMILIES.indexOf(
+    styleObject.fontFamily || "Arial"
+  );
+  const defaultFontSize = FONT_SIZES.indexOf(styleObject.fontSize || "medium");
+  const containerStyle = {
+    marginTop: "1rem",
+    display: "flex",
+    flex: "1",
+    gap: "0.5rem",
+    flexWrap: "wrap",
+    justifyContent: "end",
+  };
+  const commonStyle = { fontSize: "small", fontWeight: "bold" };
+  const checkboxStylesProps = {
+    labelStyle: {
+      ...commonStyle,
+      display: "flex",
+      alignItems: "center",
+    },
+    checkboxStyle: {
+      height: "2em",
+      width: "2em",
+      marginTop: "0",
+      marginLeft: "0",
+      marginBottom: "0",
+      marginRight: "0.25rem",
+    },
+  };
+
+  const handleChangeFontFamily = (e) => {
+    onStyleChange({
+      ...styleObject,
+      fontFamily: FONT_FAMILIES[e.target.value],
+    });
+  };
+
+  const handleChangeFontSize = (e) => {
+    onStyleChange({ ...styleObject, fontSize: FONT_SIZES[e.target.value] });
+  };
+
+  const handleChangeBoldFont = (e) => {
+    onStyleChange({
+      ...styleObject,
+      fontWeight: e.target.checked ? "bold" : "normal",
+    });
+  };
+
+  const handleChangeItalicFont = (e) => {
+    onStyleChange({
+      ...styleObject,
+      fontStyle: e.target.checked ? "italic" : "normal",
+    });
+  };
+
+  const handleChangeColor = (e) => {
+    onStyleChange({ ...styleObject, color: e.target.value });
+  };
+
   return (
-    <div
-      style={{
-        marginTop: "1rem",
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "0.5rem",
-        justifyContent: "flex-end",
-      }}
-    >
+    <div style={containerStyle}>
+      <Select
+        id={`${id}-ff-control`}
+        value={defaultFontFamily}
+        onChange={handleChangeFontFamily}
+        style={commonStyle}
+        options={FONT_FAMILIES}
+      />
       <Select
         id={`${id}-fs-control`}
         value={defaultFontSize}
-        onChange={(e) => onChangeFontSize(FONT_SIZES[e.target.value])}
-        style={{ fontSize: "xx-small", fontWeight: "bold" }}
+        onChange={handleChangeFontSize}
+        style={commonStyle}
         options={FONT_SIZES}
       />
+      <Checkbox
+        id={`${id}-bold-control`}
+        labelText={"Bold"}
+        {...checkboxStylesProps}
+        checked={styleObject.fontWeight === "bold"}
+        onChange={handleChangeBoldFont}
+      />
+      <Checkbox
+        id={`${id}-italic-control`}
+        labelText={"Italic"}
+        {...checkboxStylesProps}
+        checked={styleObject.fontStyle === "italic"}
+        onChange={handleChangeItalicFont}
+      />
       <input
+        id={`${id}-c-control`}
         type="color"
-        value={colorValue ?? ""}
-        onChange={(e) => onChangeColor(e.target.value)}
+        value={styleObject.color || "#000000"}
+        onChange={handleChangeColor}
       />
     </div>
   );
 }
 
-function Line({ id, initialText, initialStyle, editMode = false }) {
+function Line({ id, initialText, initialStyle, appColors, editMode = false }) {
   const MAX_LENGTH = 80;
 
   const [text, setText] = useState(initialText);
@@ -69,28 +171,21 @@ function Line({ id, initialText, initialStyle, editMode = false }) {
     setText((t) => (lenIsOk ? e.target.value : t));
   };
 
-  const handleChangeFontSize = (fs) => {
-    setStyle((s) => ({ ...s, fontSize: fs }));
-  };
-
-  const handleChangeColor = (c) => {
-    setStyle((s) => ({ ...s, color: c }));
-  };
-
   return editMode ? (
     <>
       <StyleController
         id={id}
-        fontSizeValue={style.fontSize}
-        onChangeFontSize={handleChangeFontSize}
-        colorValue={style.color}
-        onChangeColor={handleChangeColor}
+        styleObject={style}
+        onStyleChange={(newStyle) => {
+          setStyle((recentStyle) => ({ ...recentStyle, ...newStyle }));
+        }}
       />
       <div
         style={{
           margin: "0.5rem 0",
           display: "flex",
           alignItems: "center",
+          position: "relative",
         }}
       >
         <input
@@ -99,9 +194,17 @@ function Line({ id, initialText, initialStyle, editMode = false }) {
           maxLength={80}
           value={text}
           onChange={handleChangeInput}
-          style={{ ...style, width: "100%" }}
+          style={{ ...style, width: "100%", paddingRight: "2rem" }}
         />
-        <span style={{ ...style, marginLeft: "0.5rem" }}>
+        <span
+          style={{
+            marginLeft: "0.5rem",
+            fontSize: "x-small",
+            position: "absolute",
+            right: "0.25rem",
+            color: appColors.mid,
+          }}
+        >
           {`${text.length}/${MAX_LENGTH}`}
         </span>
       </div>
@@ -181,12 +284,49 @@ function List({ appColors, initialListItems, ordered = false }) {
   return ordered ? <ol>{jsxListItems}</ol> : <ul>{jsxListItems}</ul>;
 }
 
+function Header({ children, appColors }) {
+  return (
+    <div
+      className="header"
+      style={{
+        backgroundColor: appColors.accent,
+        position: "sticky",
+        zIndex: "1000",
+        width: "100%",
+        top: "0",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "720px",
+          margin: "0 auto",
+          padding: "1rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flex: "1",
+        }}
+      >
+        <h1
+          style={{
+            color: appColors.light,
+            margin: "0",
+          }}
+        >
+          Odin Résumé Builder
+        </h1>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const APP_COLORS = {
     accent: "#00ab44",
-    light: "#fff",
-    mid: "#777",
-    dark: "#000",
+    light: "#ffffff",
+    mid: "#7f7f7f",
+    dark: "#000000",
   };
 
   const [editMode, setEditMode] = useState(false);
@@ -203,21 +343,28 @@ function App() {
   });
 
   return (
-    <div>
+    <>
       <Header appColors={APP_COLORS}>
-        <Button
-          appColors={APP_COLORS}
-          className={"edit-btn"}
+        <button
+          type="button"
+          className="edit-btn"
           onClick={handleTogglingEditMode}
+          style={{
+            width: "6rem",
+            height: "3rem",
+            color: APP_COLORS.dark,
+            backgroundColor: APP_COLORS.light,
+          }}
         >
           {editMode ? "Submit" : "Edit"}
-        </Button>
+        </button>
       </Header>
-      <div className="resume-content">
+      <div style={{ padding: "1rem" }}>
         <Line
           {...getCommonEntryProps()}
           initialText={initialData.name}
           initialStyle={{
+            fontFamily: "Arial",
             fontSize: "xx-large",
             fontWeight: "bold",
           }}
@@ -226,6 +373,7 @@ function App() {
           {...getCommonEntryProps()}
           initialText={initialData.title}
           initialStyle={{
+            fontFamily: "Arial",
             fontSize: "x-large",
             color: APP_COLORS.accent,
           }}
@@ -235,7 +383,7 @@ function App() {
             {...getCommonEntryProps()}
             key={entry}
             initialText={entry}
-            initialStyle={{ color: APP_COLORS.mid }}
+            initialStyle={{ fontFamily: "Arial", color: APP_COLORS.mid }}
           />
         ))}
         <Head {...getCommonEntryProps()} initialText={"SKILLS"} />
@@ -281,7 +429,7 @@ function App() {
           initialListItems={initialData.awards}
         />
       </div>
-    </div>
+    </>
   );
 }
 

@@ -15,68 +15,50 @@ body {
   margin: 0;
 }
 
-.resume-content {
-  font-family: Arial, Helvetica, sans-serif;
-  padding: 2rem;
-}
-
-.edit-btn {
-  width: 6rem;
-  height: 3rem;
-}
-
-input,
-select {
-  border: none;
-  border-radius: 0.2rem;
-  padding: 0.2rem;
-  box-shadow: 0 0 2px 0 #000a;
+textarea,
+button,
+select,
+input {
+  outline: none;
+  border: 1px solid #0005;
+  border-radius: 0.35rem;
   background-color: #fff;
 }
 
+textarea:focus,
+button:focus,
 select:focus,
 input:focus {
-  outline: 1px solid #0007;
+  box-shadow: 0 0 2px 0 #0007;
 }
 
-/* Generic styles  */
-
-.fs-xx-large {
-  font-size: xx-large;
+button,
+input[type="text"] {
+  padding: 0.35rem;
 }
 
-.fs-x-large {
-  font-size: x-large;
-}
-
-.fs-large {
-  font-size: large;
-}
-
-.fs-xx-small {
-  font-size: xx-small;
-}
-
-.fs-x-small {
-  font-size: x-small;
-}
-
-.fs-small {
-  font-size: small;
-}
-
-.fw-bold {
+button {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: medium;
   font-weight: bold;
+  padding: 0.5rem 1rem;
+  transition: transform 150ms;
 }
 
-.fw-light {
-  font-weight: lighter;
+button:active {
+  filter: invert();
 }
 
-.fw-normal {
-  font-weight: normal;
+@media (pointer: fine) {
+  button:hover {
+    transform: scale(1.1);
+  }
 }
 
-.fs-italic {
-  font-style: italic;
+@media (prefers-reduced-motion) {
+  button {
+    transition: none;
+  }
 }
