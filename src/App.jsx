@@ -1,19 +1,29 @@
-import { createContext, Fragment, useContext, useState } from "react";
+import {
+  createContext,
+  Fragment,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { initialData } from "./data/initialData";
-
-const AppColorsContext = createContext({});
 
 const EditModeContext = createContext(false);
 
-function Select({ options, ...props }) {
+const AppColorsContext = createContext({});
+
+const AppDefaultsContext = createContext({});
+
+function Select({ id, title, labelStyle, inputStyle, options, ...props }) {
   return (
-    <select {...props}>
-      {options.map((o, i) => (
-        <option key={o} value={i} style={props.style}>
-          {o}
-        </option>
-      ))}
-    </select>
+    <label htmlFor={id} title={title} style={labelStyle}>
+      <select id={id} style={inputStyle} {...props}>
+        {options.map((opt, i) => (
+          <option key={opt} value={i} style={inputStyle}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -41,13 +51,13 @@ function Checkbox({
   );
 }
 
-function StyleController({
+function FontFamilyController({
   id,
+  inputStyle,
+  labelStyle,
   styleObject,
-  onStyleChange,
-  withMarginBottom = true,
+  onChangeStyle,
 }) {
-  const appColors = useContext(AppColorsContext);
   const FONT_FAMILIES = [
     "sans-serif",
     "Arial",
@@ -64,6 +74,39 @@ function StyleController({
     "cursive",
   ];
 
+  const defaultFontFamily = FONT_FAMILIES.indexOf(
+    styleObject.fontFamily || "Arial"
+  );
+
+  const handleChangeFontFamily = (e) => {
+    if (e.target.value >= 0 && e.target.value < FONT_FAMILIES.length) {
+      onChangeStyle({
+        ...styleObject,
+        fontFamily: FONT_FAMILIES[e.target.value],
+      });
+    }
+  };
+
+  return (
+    <Select
+      title="Font family"
+      id={`${id}-ff-control`}
+      value={defaultFontFamily}
+      onChange={handleChangeFontFamily}
+      inputStyle={inputStyle}
+      labelStyle={labelStyle}
+      options={FONT_FAMILIES}
+    />
+  );
+}
+
+function FontSizeController({
+  id,
+  inputStyle,
+  labelStyle,
+  styleObject,
+  onChangeStyle,
+}) {
   const FONT_SIZES = [
     "xx-small",
     "x-small",
@@ -74,15 +117,155 @@ function StyleController({
     "xx-large",
   ];
 
-  const defaultFontFamily = FONT_FAMILIES.indexOf(
-    styleObject.fontFamily || "Arial"
-  );
-
   const defaultFontSize = FONT_SIZES.indexOf(styleObject.fontSize || "medium");
+
+  const handleChangeFontSize = (e) => {
+    if (e.target.value >= 0 && e.target.value < FONT_SIZES.length) {
+      onChangeStyle({ ...styleObject, fontSize: FONT_SIZES[e.target.value] });
+    }
+  };
+
+  return (
+    <Select
+      title="Font size"
+      id={`${id}-fs-control`}
+      value={defaultFontSize}
+      onChange={handleChangeFontSize}
+      inputStyle={inputStyle}
+      labelStyle={labelStyle}
+      options={FONT_SIZES}
+    />
+  );
+}
+
+function FontStyleController({
+  id,
+  styleObject,
+  onChangeStyle,
+  ...checkboxStylesProps
+}) {
+  const handleChangeBoldFont = (e) => {
+    onChangeStyle({
+      ...styleObject,
+      fontWeight: e.target.checked ? "bold" : "normal",
+    });
+  };
+
+  const handleChangeItalicFont = (e) => {
+    onChangeStyle({
+      ...styleObject,
+      fontStyle: e.target.checked ? "italic" : "normal",
+    });
+  };
+
+  return (
+    <>
+      <Checkbox
+        id={`${id}-bold-control`}
+        labelText={"Bold"}
+        {...checkboxStylesProps}
+        checked={styleObject.fontWeight === "bold"}
+        onChange={handleChangeBoldFont}
+      />
+      <Checkbox
+        id={`${id}-italic-control`}
+        labelText={"Italic"}
+        {...checkboxStylesProps}
+        checked={styleObject.fontStyle === "italic"}
+        onChange={handleChangeItalicFont}
+      />
+    </>
+  );
+}
+
+function ColorController({
+  id,
+  inputStyle,
+  labelStyle,
+  styleObject,
+  onChangeStyle,
+}) {
+  const handleChangeColor = (e) => {
+    onChangeStyle({ ...styleObject, color: e.target.value });
+  };
+
+  return (
+    <label htmlFor={`${id}-c-control`} title="Color" style={labelStyle}>
+      <input
+        id={`${id}-c-control`}
+        type="color"
+        value={styleObject.color || "#000000"}
+        style={inputStyle}
+        onChange={handleChangeColor}
+      />
+    </label>
+  );
+}
+
+function MarginBottomController({
+  id,
+  inputStyle,
+  labelStyle,
+  styleObject,
+  onChangeStyle,
+}) {
+  const appColors = useContext(AppColorsContext);
 
   const defaultMarginBottomDigit = !styleObject.marginBottom
     ? 1
     : Number(`${styleObject.marginBottom}`.match(/^\d+(\.\d+)?/)[0]);
+
+  const handleChangeMarginBottom = (e) => {
+    if (e.target.value >= 0 && e.target.value <= 5) {
+      onChangeStyle({
+        ...styleObject,
+        marginBottom: `${e.target.value}${e.target.value > 0 ? "rem" : ""}`,
+      });
+    }
+  };
+
+  return (
+    <label
+      htmlFor={`${id}-mb-control`}
+      title="Margin Bottom"
+      style={labelStyle}
+    >
+      <input
+        type="range"
+        id={`${id}-mb-control`}
+        min={0}
+        max={5}
+        step={0.25}
+        value={defaultMarginBottomDigit}
+        style={inputStyle}
+        onChange={handleChangeMarginBottom}
+      />
+      <span
+        style={{
+          fontSize: "x-small",
+          width: "1.75rem",
+          marginLeft: "0.25rem",
+          color: appColors.mid,
+        }}
+      >
+        {defaultMarginBottomDigit}x
+      </span>
+    </label>
+  );
+}
+
+function StyleController({
+  id,
+  styleObject,
+  onChangeStyle,
+  withColorController = true,
+  withFontSizeController = true,
+  withFontStyleController = true,
+  withFontFamilyController = true,
+  withMarginBottomController = true,
+}) {
+  const appColors = useContext(AppColorsContext);
+  const appDefaultsContext = useContext(AppDefaultsContext);
 
   const inputMinHeight = "2em";
 
@@ -96,7 +279,7 @@ function StyleController({
   const containerStyle = {
     width: "100%",
     minHeight: inputMinHeight,
-    marginBottom: "0.25rem",
+    marginBottom: appDefaultsContext.marginBottom,
     display: "flex",
     gap: "0.5rem",
     flexWrap: "wrap",
@@ -121,116 +304,31 @@ function StyleController({
     },
   };
 
-  const handleChangeFontFamily = (e) => {
-    if (e.target.value >= 0 && e.target.value < FONT_FAMILIES.length) {
-      onStyleChange({
-        ...styleObject,
-        fontFamily: FONT_FAMILIES[e.target.value],
-      });
-    }
-  };
-
-  const handleChangeFontSize = (e) => {
-    if (e.target.value >= 0 && e.target.value < FONT_SIZES.length) {
-      onStyleChange({ ...styleObject, fontSize: FONT_SIZES[e.target.value] });
-    }
-  };
-
-  const handleChangeBoldFont = (e) => {
-    onStyleChange({
-      ...styleObject,
-      fontWeight: e.target.checked ? "bold" : "normal",
-    });
-  };
-
-  const handleChangeItalicFont = (e) => {
-    onStyleChange({
-      ...styleObject,
-      fontStyle: e.target.checked ? "italic" : "normal",
-    });
-  };
-
-  const handleChangeColor = (e) => {
-    onStyleChange({ ...styleObject, color: e.target.value });
-  };
-
-  const handleChangeMarginBottom = (e) => {
-    if (e.target.value >= 0 && e.target.value <= 5) {
-      onStyleChange({
-        ...styleObject,
-        marginBottom: `${e.target.value}${e.target.value > 0 ? "rem" : ""}`,
-      });
-    }
+  const commonControlProps = {
+    id: id,
+    labelStyle: labelStyle,
+    inputStyle: commonStyle,
+    styleObject: styleObject,
+    onChangeStyle: onChangeStyle,
   };
 
   return (
     <div style={containerStyle}>
-      <Select
-        title="Font family"
-        id={`${id}-ff-control`}
-        value={defaultFontFamily}
-        onChange={handleChangeFontFamily}
-        style={commonStyle}
-        options={FONT_FAMILIES}
-      />
-      <Select
-        title="Font size"
-        id={`${id}-fs-control`}
-        value={defaultFontSize}
-        onChange={handleChangeFontSize}
-        style={commonStyle}
-        options={FONT_SIZES}
-      />
-      <Checkbox
-        id={`${id}-bold-control`}
-        labelText={"Bold"}
-        {...checkboxStylesProps}
-        checked={styleObject.fontWeight === "bold"}
-        onChange={handleChangeBoldFont}
-      />
-      <Checkbox
-        id={`${id}-italic-control`}
-        labelText={"Italic"}
-        {...checkboxStylesProps}
-        checked={styleObject.fontStyle === "italic"}
-        onChange={handleChangeItalicFont}
-      />
-      <label htmlFor={`${id}-c-control`} title="Color" style={labelStyle}>
-        <input
-          id={`${id}-c-control`}
-          type="color"
-          value={styleObject.color || "#000000"}
-          style={commonStyle}
-          onChange={handleChangeColor}
+      {withFontFamilyController && (
+        <FontFamilyController {...commonControlProps} />
+      )}
+      {withFontSizeController && <FontSizeController {...commonControlProps} />}
+      {withFontStyleController && (
+        <FontStyleController
+          id={id}
+          {...checkboxStylesProps}
+          styleObject={styleObject}
+          onChangeStyle={onChangeStyle}
         />
-      </label>
-      {withMarginBottom && (
-        <label
-          htmlFor={`${id}-mb-control`}
-          title="Margin Bottom"
-          style={labelStyle}
-        >
-          <input
-            type="range"
-            id={`${id}-mb-control`}
-            min={0}
-            max={5}
-            step={0.25}
-            value={defaultMarginBottomDigit}
-            style={commonStyle}
-            onChange={handleChangeMarginBottom}
-          />
-          <span
-            style={{
-              fontSize: "x-small",
-              width: "1.75rem",
-              marginLeft: "0.25rem",
-              color: appColors.mid,
-            }}
-          >
-            {defaultMarginBottomDigit}x
-          </span>
-        </label>
+      )}
+      {withColorController && <ColorController {...commonControlProps} />}
+      {withMarginBottomController && (
+        <MarginBottomController {...commonControlProps} />
       )}
     </div>
   );
@@ -303,115 +401,99 @@ function TextEditor({
   );
 }
 
-const ENTRY_TYPES = {
-  LINE: "L",
-  HEAD: "H",
-  SUBHEAD: "S",
-  DATE: "D",
-  PARAGRAPH: "P",
-  LIST_ITEM: "LI",
-};
+function EditCard({
+  id,
+  entryStyle,
+  entryText,
+  entryTextMaxLength,
+  onChangeStyle,
+  onChangeText,
+  editCardStyle,
+  textAreaEditor = false,
+  ...styleControlFlags
+}) {
+  const appColors = useContext(AppColorsContext);
+
+  return (
+    <div
+      style={{
+        backgroundColor: appColors.lightAccent,
+        boxShadow: "0 0 3px 0 #0007",
+        borderRadius: "1rem",
+        padding: "1rem",
+        ...editCardStyle,
+      }}
+    >
+      <StyleController
+        id={id}
+        styleObject={entryStyle}
+        onChangeStyle={onChangeStyle}
+        {...styleControlFlags}
+      />
+      <TextEditor
+        id={id}
+        text={entryText}
+        maxLength={entryTextMaxLength}
+        style={entryStyle}
+        onChange={onChangeText}
+        textAreaInput={textAreaEditor}
+      />
+    </div>
+  );
+}
 
 function Entry({
   id,
   initialText,
   initialStyle,
-  entryType,
-  forSubEntry = false,
+  forParagraph = false,
+  forListItem = false,
 }) {
   const editMode = useContext(EditModeContext);
-  const appColors = useContext(AppColorsContext);
+  const appDefaultsContext = useContext(AppDefaultsContext);
 
   const [text, setText] = useState(initialText);
   const [style, setStyle] = useState({
-    marginBottom: "0.25rem",
+    marginBottom: appDefaultsContext.marginBottom,
     ...initialStyle,
   });
 
-  const TEXT_MAX_LENGTH = entryType === ENTRY_TYPES.PARAGRAPH ? 999 : 80;
+  const TEXT_MAX_LENGTH = forParagraph
+    ? appDefaultsContext.textMaxLength.paragraph
+    : appDefaultsContext.textMaxLength.line;
 
-  const handleChangeInput = (e) => {
+  const handleChangeText = (e) => {
     const lenIsOk = e.target.value.length <= TEXT_MAX_LENGTH;
     setText((t) => (lenIsOk ? e.target.value : t));
   };
 
-  const editModeStyle = {
-    backgroundColor: appColors.lightAccent,
-    padding: "1rem",
-    boxShadow: "0 0 3px 0 #0007",
-    borderRadius: "1rem",
+  const handleChangeStyle = (newStyle) => {
+    setStyle((recentStyle) => ({ ...recentStyle, ...newStyle }));
   };
 
-  const styleController = (
-    <StyleController
-      id={id}
-      styleObject={style}
-      onStyleChange={(newStyle) => {
-        setStyle((recentStyle) => ({ ...recentStyle, ...newStyle }));
-      }}
-      withMarginBottom={!forSubEntry}
-    />
-  );
+  const editCardCommonProps = {
+    id: id,
+    entryText: text,
+    entryStyle: style,
+    editCardStyle: { margin: appDefaultsContext.editCardMargin },
+    entryTextMaxLength: TEXT_MAX_LENGTH,
+    onChangeStyle: handleChangeStyle,
+    onChangeText: handleChangeText,
+    textAreaEditor: forParagraph,
+    withMarginBottomController: true,
+  };
 
-  const textEditor = (
-    <TextEditor
-      id={id}
-      text={text}
-      maxLength={TEXT_MAX_LENGTH}
-      style={style}
-      onChange={handleChangeInput}
-      textAreaInput={entryType === ENTRY_TYPES.PARAGRAPH}
-    />
+  return editMode ? (
+    <EditCard {...editCardCommonProps} />
+  ) : forListItem ? (
+    <li style={style}>{text}</li>
+  ) : (
+    <div style={style}>{text}</div>
   );
-
-  switch (entryType) {
-    case ENTRY_TYPES.LINE:
-    case ENTRY_TYPES.HEAD:
-    case ENTRY_TYPES.PARAGRAPH:
-    case ENTRY_TYPES.LIST_ITEM:
-      return editMode ? (
-        <div
-          style={{
-            ...editModeStyle,
-            margin: "2rem auto",
-          }}
-        >
-          {styleController}
-          {textEditor}
-        </div>
-      ) : entryType === ENTRY_TYPES.LIST_ITEM ? (
-        <li style={style}>{text}</li>
-      ) : (
-        <div style={style}>{text}</div>
-      );
-    case ENTRY_TYPES.SUBHEAD:
-    case ENTRY_TYPES.DATE:
-      return editMode ? (
-        <div
-          style={{
-            ...editModeStyle,
-            flexGrow: "1",
-            flexBasis: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          }}
-        >
-          {styleController}
-          {textEditor}
-        </div>
-      ) : (
-        <div style={style}>{text}</div>
-      );
-    default:
-      throw TypeError("Invalid 'Entry' type!");
-  }
 }
 
 function Line({ initialText = "Line", ...props }) {
-  return (
-    <Entry {...props} initialText={initialText} entryType={ENTRY_TYPES.LINE} />
-  );
+  return <Entry {...props} initialText={initialText} />;
 }
 
 function Head({ initialText = "Headline", ...props }) {
@@ -424,23 +506,12 @@ function Head({ initialText = "Headline", ...props }) {
   };
 
   return (
-    <Entry
-      {...props}
-      initialText={initialText}
-      initialStyle={initialStyle}
-      entryType={ENTRY_TYPES.HEAD}
-    />
+    <Entry {...props} initialText={initialText} initialStyle={initialStyle} />
   );
 }
 
-function Paragraph({ initialText, ...props }) {
+function Paragraph({ initialText = initialData.experience, ...props }) {
   const appColors = useContext(AppColorsContext);
-  initialText =
-    initialText ||
-    "Lorem ipsum dolor sit amet, " +
-      "consectetuer adipiscing elit, " +
-      "sed diam nonummy nibh euismod tincidunt " +
-      "ut laoreet dolore magna aliquam erat volutpat.";
   const initialStyle = {
     marginBottom: "2rem",
     color: appColors.dark,
@@ -450,157 +521,216 @@ function Paragraph({ initialText, ...props }) {
       {...props}
       initialText={initialText}
       initialStyle={initialStyle}
-      entryType={ENTRY_TYPES.PARAGRAPH}
+      forParagraph={true}
     />
   );
 }
 
-/**
- * Returns the current window's inner width
- * @returns {number}
- */
 function useWindowInnerWidth() {
   const [width, setWidth] = useState(window.innerWidth);
 
-  const handleResize = (e) => {
-    setWidth(e.target.innerWidth);
-  };
+  useEffect(() => {
+    const handleResize = (e) => {
+      setWidth(e.target.innerWidth);
+    };
 
-  window.addEventListener("resize", handleResize, { passive: true });
+    const listenerOptions = { passive: true };
+
+    window.addEventListener("resize", handleResize, listenerOptions);
+
+    return () => {
+      window.removeEventListener("resize", handleResize, listenerOptions);
+    };
+  }, []);
 
   return width;
 }
 
-/**
- * Returns "wrap" if window's inner width less that the given "maxWidth"
- * Otherwise, returns "nowrap"
- * @param {number} maxWidth
- * @returns {string}
- */
-
-function useFlexWrap(maxWidth) {
-  const windowInnerWidth = useWindowInnerWidth();
-
-  return windowInnerWidth < maxWidth ? "wrap" : "nowrap";
-}
-
-// TODO: Create a ExtendedEntry component to avoid the redundancy in SubHead & Date
-// TODO: Fix a bug in edit margin for an extended entry
-
-function SubHead({
+function ExtendedEntry({
   id,
-  initialText = "Organization, Location",
-  initialExtensionText = "Title",
-  ...props
+  initialMainText,
+  initialExtensionText,
+  initialMainStyle,
+  initialExtensionStyle,
 }) {
   const editMode = useContext(EditModeContext);
-  const appColors = useContext(AppColorsContext);
+  const appDefaultsContext = useContext(AppDefaultsContext);
 
-  const mainContentStyle = { fontSize: "large", fontWeight: "bold" };
-  const extensionStyle = {
-    fontSize: "large",
-    fontWeight: "normal",
-    fontStyle: "italic",
-    color: appColors.mid,
+  const TEXT_MAX_LENGTH = appDefaultsContext.textMaxLength.line;
+
+  const windowInnerWidth = useWindowInnerWidth();
+
+  const [mainText, setMainText] = useState(initialMainText);
+  const [extensionText, setExtensionText] = useState(initialExtensionText);
+  const [mainStyle, setMainStyle] = useState({
+    marginBottom: appDefaultsContext.marginBottom,
+    ...initialMainStyle,
+  });
+  const [extensionStyle, setExtensionStyle] = useState({
+    ...initialExtensionStyle,
+    marginBottom: mainStyle.marginBottom,
+  });
+
+  const isValidLength = (text) => text.length <= TEXT_MAX_LENGTH;
+
+  const handleChangeMainText = (e) => {
+    if (isValidLength(e.targe.value)) {
+      setMainText(() => e.target.value);
+    }
   };
+
+  const handleChangeExtensionText = (e) => {
+    if (isValidLength(e.targe.value)) {
+      setExtensionText(() => e.target.value);
+    }
+  };
+
+  const handleChangeMainStyle = (newStyle) => {
+    setMainStyle((recentStyle) => ({ ...recentStyle, ...newStyle }));
+    setExtensionStyle((recentStyle) => ({
+      ...recentStyle,
+      marginBottom: newStyle.marginBottom,
+      fontFamily: newStyle.fontFamily,
+      fontSize: newStyle.fontSize,
+    }));
+  };
+
+  const handleChangeExtensionStyle = (newStyle) => {
+    setExtensionStyle((recentStyle) => ({
+      ...recentStyle,
+      ...newStyle,
+    }));
+  };
+
   const containerStyle = {
     display: "flex",
-    flexWrap: useFlexWrap(480),
+    flexWrap: windowInnerWidth < 480 ? "wrap" : "nowrap",
     gap: `${editMode ? "1rem" : "0.5rem"}`,
   };
 
-  if (editMode) containerStyle.margin = "2rem auto";
+  if (editMode) containerStyle.margin = appDefaultsContext.editCardMargin;
+
+  const editCardStyle = {
+    flexGrow: "1",
+    flexBasis: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  };
+
+  const editCardCommonProps = {
+    editCardStyle: editCardStyle,
+    entryTextMaxLength: TEXT_MAX_LENGTH,
+    textAreaEditor: false,
+  };
 
   return (
     <div style={containerStyle}>
-      <Entry
-        {...props}
-        id={id}
-        initialText={initialText}
-        initialStyle={mainContentStyle}
-        entryType={ENTRY_TYPES.SUBHEAD}
-      />
-      {initialExtensionText && (
+      {editMode ? (
         <>
-          {!editMode && <div style={extensionStyle}>-</div>}
-          <Entry
-            {...props}
-            id={`${id}-ext`}
-            initialText={initialExtensionText}
-            initialStyle={extensionStyle}
-            entryType={ENTRY_TYPES.SUBHEAD}
-            forSubEntry={true}
+          <EditCard
+            {...editCardCommonProps}
+            id={id}
+            entryText={mainText}
+            entryStyle={mainStyle}
+            onChangeStyle={handleChangeMainStyle}
+            onChangeText={handleChangeMainText}
           />
+          <EditCard
+            {...editCardCommonProps}
+            id={`${id}-ext`}
+            entryText={extensionText}
+            entryStyle={extensionStyle}
+            onChangeStyle={handleChangeExtensionStyle}
+            onChangeText={handleChangeExtensionText}
+            withMarginBottomController={false}
+            withFontFamilyController={false}
+            withFontSizeController={false}
+          />
+        </>
+      ) : (
+        <>
+          <div style={mainStyle}>{mainText}</div>
+          {initialExtensionText && (
+            <>
+              {!editMode && <div style={extensionStyle}>-</div>}
+              <div style={extensionStyle}>{extensionText}</div>
+            </>
+          )}
         </>
       )}
     </div>
   );
 }
 
-// TODO: Think about adding DateEditor to use it for date instead of TextEditor
-
-function Date({
+function SubHead({
   id,
-  initialFrom = "MONTH 20XX",
-  initialTo = "PRESENT",
-  ...props
+  initialText = "Organization, Location",
+  initialExtensionText = "Title",
 }) {
-  const editMode = useContext(EditModeContext);
   const appColors = useContext(AppColorsContext);
 
-  const mainContentStyle = {
+  const extensionStyle = {
+    fontSize: "large",
+    fontWeight: "normal",
+    fontStyle: "italic",
+    color: appColors.mid,
+  };
+
+  return (
+    <ExtendedEntry
+      id={id}
+      initialMainText={initialText}
+      initialExtensionText={initialExtensionText}
+      initialMainStyle={{ fontSize: "large", fontWeight: "bold" }}
+      initialExtensionStyle={extensionStyle}
+    />
+  );
+}
+
+// TODO: Think about adding DateEditor to use it for date instead of TextEditor
+
+function Date({ id, initialFrom = "MONTH 20XX", initialTo = "PRESENT" }) {
+  const appColors = useContext(AppColorsContext);
+
+  const mainStyle = {
     fontSize: "small",
     marginBottom: "1rem",
     color: appColors.mid,
   };
-  const containerStyle = {
-    display: "flex",
-    flexWrap: useFlexWrap(480),
-    gap: `${editMode ? "1rem" : "0.5rem"}`,
-  };
-
-  if (editMode) containerStyle.margin = "2rem auto";
 
   return (
-    <div style={containerStyle}>
-      <Entry
-        {...props}
-        id={id}
-        initialText={initialFrom}
-        initialStyle={mainContentStyle}
-        entryType={ENTRY_TYPES.DATE}
-      />
-      {!editMode && <div style={mainContentStyle}>-</div>}
-      <Entry
-        {...props}
-        id={`${id}-ext`}
-        initialText={initialTo}
-        initialStyle={mainContentStyle}
-        entryType={ENTRY_TYPES.DATE}
-        forSubEntry={true}
-      />
-    </div>
+    <ExtendedEntry
+      id={id}
+      initialMainText={initialFrom}
+      initialExtensionText={initialTo}
+      initialMainStyle={mainStyle}
+      initialExtensionStyle={mainStyle}
+    />
   );
 }
 
-function List({ id, initialListItems, ordered = false, ...props }) {
+function List({ id, initialListItems, ordered = false }) {
   const editMode = useContext(EditModeContext);
   const appColors = useContext(AppColorsContext);
 
-  const listStyle = { marginBottom: "2rem" };
+  const listStyle = { margin: "0" };
 
   if (editMode) listStyle.padding = "0";
 
-  const jsxListItems = initialListItems.map((listItem, i) => (
-    <Entry
-      {...props}
-      key={listItem}
-      id={`${id}-${i}`}
-      initialText={listItem}
-      initialStyle={{ color: appColors.dark }}
-      entryType={ENTRY_TYPES.LIST_ITEM}
-    />
-  ));
+  const jsxListItems = initialListItems.map((listItem, i, arr) => {
+    const initialStyle = { color: appColors.dark };
+    if (i === arr.length - 1) initialStyle.marginBottom = "2rem";
+    return (
+      <Entry
+        key={listItem}
+        id={`${id}-${i}`}
+        initialText={listItem}
+        initialStyle={initialStyle}
+        forListItem={true}
+      />
+    );
+  });
   return ordered ? (
     <ol style={listStyle}>{jsxListItems}</ol>
   ) : (
@@ -648,7 +778,6 @@ function Header({ children }) {
 }
 
 function App() {
-  // TODO: Scroll to the same place after toggle edit mode
   const [editMode, setEditMode] = useState(false);
   const handleTogglingEditMode = () => {
     setEditMode((iem) => !iem);
@@ -662,90 +791,104 @@ function App() {
     dark: "#000000",
   };
 
+  const appDefaultsContext = {
+    textMaxLength: {
+      line: 80,
+      paragraph: 999,
+    },
+    editCardMargin: "2rem auto",
+    marginBottom: "0.25rem",
+  };
+
   let entriesCount = 0;
   const generateId = () => `entry-${++entriesCount}`;
 
   return (
-    <AppColorsContext.Provider value={appColors}>
-      <EditModeContext.Provider value={editMode}>
-        <Header>
-          <button
-            type="button"
-            className="edit-btn"
-            onClick={handleTogglingEditMode}
-            style={{
-              width: "6rem",
-              height: "3rem",
-              color: appColors.dark,
-              backgroundColor: appColors.light,
-            }}
-          >
-            {editMode ? "Submit" : "Edit"}
-          </button>
-        </Header>
-        <div style={{ padding: "1rem" }}>
-          <Line
-            id={generateId()}
-            initialText={initialData.name}
-            initialStyle={{
-              fontFamily: "Arial",
-              fontSize: "xx-large",
-              fontWeight: "bold",
-              color: appColors.dark,
-            }}
-          />
-          <Line
-            id={generateId()}
-            initialText={initialData.title}
-            initialStyle={{
-              fontFamily: "Arial",
-              fontSize: "x-large",
-              color: appColors.accent,
-            }}
-          />
-          {initialData.contact.map((entry, i, arr) => {
-            const initialStyle = { fontFamily: "Arial", color: appColors.mid };
-            if (i === arr.length - 1) initialStyle.marginBottom = "2rem";
-            return (
-              <Line
-                id={generateId()}
-                key={entry}
-                initialText={entry}
-                initialStyle={initialStyle}
-              />
-            );
-          })}
-          <Head id={generateId()} initialText={"SKILLS"} />
-          <Paragraph id={generateId()} initialText={initialData.skills} />
-          <Head id={generateId()} initialText={"EXPERIENCE"} />
-          {initialData.experience.map((entry) => (
-            <Fragment key={`${entry.org} - ${entry.title}`}>
-              <SubHead
-                id={generateId()}
-                initialText={entry.org}
-                initialExtensionText={entry.title}
-              />
-              <Date id={generateId()} />
-              <List id={generateId()} initialListItems={entry.details} />
-            </Fragment>
-          ))}
-          <Head id={generateId()} initialText={"EDUCATION"} />
-          {initialData.education.map((entry) => (
-            <Fragment key={`${entry.org} - ${entry.deg}`}>
-              <SubHead
-                id={generateId()}
-                initialText={entry.org}
-                initialExtensionText={entry.deg}
-              />
-              <Date id={generateId()} />
-              <Paragraph id={generateId()} initialText={entry.about} />
-            </Fragment>
-          ))}
-          <Head id={generateId()} initialText={"AWARDS"} />
-          <List id={generateId()} initialListItems={initialData.awards} />
-        </div>
-      </EditModeContext.Provider>
-    </AppColorsContext.Provider>
+    <AppDefaultsContext.Provider value={appDefaultsContext}>
+      <AppColorsContext.Provider value={appColors}>
+        <EditModeContext.Provider value={editMode}>
+          <Header>
+            <button
+              type="button"
+              className="edit-btn"
+              onClick={handleTogglingEditMode}
+              style={{
+                width: "6rem",
+                height: "3rem",
+                color: appColors.dark,
+                backgroundColor: appColors.light,
+              }}
+            >
+              {editMode ? "Submit" : "Edit"}
+            </button>
+          </Header>
+          <div style={{ padding: "1rem" }}>
+            <Line
+              id={generateId()}
+              initialText={initialData.name}
+              initialStyle={{
+                fontFamily: "Arial",
+                fontSize: "xx-large",
+                fontWeight: "bold",
+                color: appColors.dark,
+              }}
+            />
+            <Line
+              id={generateId()}
+              initialText={initialData.title}
+              initialStyle={{
+                fontFamily: "Arial",
+                fontSize: "x-large",
+                color: appColors.accent,
+              }}
+            />
+            {initialData.contact.map((entry, i, arr) => {
+              const initialStyle = {
+                fontFamily: "Arial",
+                color: appColors.mid,
+              };
+              if (i === arr.length - 1) initialStyle.marginBottom = "2rem";
+              return (
+                <Line
+                  id={generateId()}
+                  key={entry}
+                  initialText={entry}
+                  initialStyle={initialStyle}
+                />
+              );
+            })}
+            <Head id={generateId()} initialText={"SKILLS"} />
+            <Paragraph id={generateId()} initialText={initialData.skills} />
+            <Head id={generateId()} initialText={"EXPERIENCE"} />
+            {initialData.experience.map((entry) => (
+              <Fragment key={`${entry.org} - ${entry.title}`}>
+                <SubHead
+                  id={generateId()}
+                  initialText={entry.org}
+                  initialExtensionText={entry.title}
+                />
+                <Date id={generateId()} />
+                <List id={generateId()} initialListItems={entry.details} />
+              </Fragment>
+            ))}
+            <Head id={generateId()} initialText={"EDUCATION"} />
+            {initialData.education.map((entry) => (
+              <Fragment key={`${entry.org} - ${entry.deg}`}>
+                <SubHead
+                  id={generateId()}
+                  initialText={entry.org}
+                  initialExtensionText={entry.deg}
+                />
+                <Date id={generateId()} />
+                <Paragraph id={generateId()} initialText={entry.about} />
+              </Fragment>
+            ))}
+            <Head id={generateId()} initialText={"AWARDS"} />
+            <List id={generateId()} initialListItems={initialData.awards} />
+          </div>
+        </EditModeContext.Provider>
+      </AppColorsContext.Provider>
+    </AppDefaultsContext.Provider>
   );
 }
 
