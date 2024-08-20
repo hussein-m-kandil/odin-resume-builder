@@ -1,18 +1,36 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AppColorsContext } from "../context/AppColorsContext";
 import { EditModeContext } from "../context/EditModeContext";
 import Entry from "./Entry";
 import { initialData } from "../data/initialData";
 
-function List({ id, initialListItems, ordered = false, ...props }) {
+function List({
+  id,
+  initialListItems,
+  onDeleteEntry,
+  ordered = false,
+  ...props
+}) {
   const editMode = useContext(EditModeContext);
   const appColors = useContext(AppColorsContext);
 
-  const listStyle = { margin: "0" };
+  const genListItemId = (listId, index) => {
+    return `${listId}-${index}`;
+  };
 
-  if (editMode) listStyle.padding = "0";
+  const deleteMe = () => onDeleteEntry(id);
 
-  const listItems = initialListItems || initialData.education;
+  const [listItems, setListItems] = useState(
+    initialListItems || initialData.awards
+  );
+
+  const handleDeleteListItem = (listItemId) => {
+    const updatedListItems = listItems.filter(
+      (li, i) => genListItemId(id, i) !== listItemId
+    );
+    if (updatedListItems.length === 0) deleteMe();
+    else setListItems(updatedListItems);
+  };
 
   const jsxListItems = listItems.map((listItem, i, arr) => {
     const initialStyle = { fontFamily: "sans-serif", color: appColors.dark };
@@ -21,13 +39,19 @@ function List({ id, initialListItems, ordered = false, ...props }) {
       <Entry
         {...props}
         key={listItem}
-        id={`${id}-${i}`}
+        id={genListItemId(id, i)}
         initialText={listItem}
         initialStyle={initialStyle}
+        onDeleteEntry={handleDeleteListItem}
         forListItem={true}
       />
     );
   });
+
+  const listStyle = { margin: "0" };
+
+  if (editMode) listStyle.padding = "0";
+
   return ordered ? (
     <ol style={listStyle}>{jsxListItems}</ol>
   ) : (

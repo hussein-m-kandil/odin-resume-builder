@@ -3,7 +3,7 @@ import { AppColorsContext } from "../context/AppColorsContext";
 import { initialData } from "../data/initialData";
 import Entry from "./Entry";
 
-function Paragraph({ initialText = initialData.experience, ...props }) {
+function Paragraph({ initialText = initialData.skills, ...props }) {
   const appColors = useContext(AppColorsContext);
   const initialStyle = {
     fontFamily: "sans-serif",

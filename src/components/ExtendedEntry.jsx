@@ -10,6 +10,7 @@ function ExtendedEntry({
   initialExtensionText,
   initialMainStyle,
   initialExtensionStyle,
+  onDeleteEntry,
   ...props
 }) {
   const editMode = useContext(EditModeContext);
@@ -29,6 +30,8 @@ function ExtendedEntry({
     ...initialExtensionStyle,
     marginBottom: mainStyle.marginBottom,
   });
+
+  const genExtensionId = () => `${id}-ext`;
 
   const isValidLength = (text) => text.length <= TEXT_MAX_LENGTH;
 
@@ -59,6 +62,10 @@ function ExtendedEntry({
       ...recentStyle,
       ...newStyle,
     }));
+  };
+
+  const handleDeleteEntry = () => {
+    onDeleteEntry(id);
   };
 
   const containerStyle = {
@@ -94,15 +101,17 @@ function ExtendedEntry({
             entryStyle={mainStyle}
             onChangeStyle={handleChangeMainStyle}
             onChangeText={handleChangeMainText}
+            onDeleteEntry={handleDeleteEntry}
             {...props}
           />
           <EditCard
             {...editCardCommonProps}
-            id={`${id}-ext`}
+            id={genExtensionId()}
             entryText={extensionText}
             entryStyle={extensionStyle}
             onChangeStyle={handleChangeExtensionStyle}
             onChangeText={handleChangeExtensionText}
+            onDeleteEntry={handleDeleteEntry}
             withMarginBottomController={false}
             withFontFamilyController={false}
             withFontSizeController={false}
