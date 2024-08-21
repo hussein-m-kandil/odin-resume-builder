@@ -1,8 +1,13 @@
 import { useContext } from "react";
 import { AppColorsContext } from "../context/AppColorsContext";
+import useWindowInnerWidth from "../hooks/useWindowInnerWidth";
+
+const BREAK_POINT = 800;
 
 function Header({ children }) {
   const appColors = useContext(AppColorsContext);
+
+  const viewWidth = useWindowInnerWidth();
 
   return (
     <div
@@ -17,19 +22,21 @@ function Header({ children }) {
     >
       <div
         style={{
-          maxWidth: "720px",
           margin: "0 auto",
           padding: "1rem",
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
           flex: "1",
+          gap: "1rem",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: viewWidth < BREAK_POINT ? "center" : "space-between",
         }}
       >
         <h1
           style={{
             color: appColors.light,
             margin: "0",
+            textAlign: viewWidth < BREAK_POINT ? "center" : "left",
           }}
         >
           Odin Résumé Builder
