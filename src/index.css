@@ -30,7 +30,7 @@ textarea:focus,
 button:focus,
 select:focus,
 input:focus {
-  box-shadow: 0 0 2px 0 #0007;
+  outline: 3px solid #0003;
 }
 
 button,
@@ -46,7 +46,6 @@ button {
   font-size: medium;
   font-weight: bold;
   padding: 0.5rem 1rem;
-  transition: transform 150ms;
 }
 
 button:active {
@@ -54,13 +53,16 @@ button:active {
 }
 
 @media (pointer: fine) {
+  .grow-on-hover:hover,
   button:hover {
+    transition: transform 150ms;
     transform: scale(1.1);
   }
 }
 
 @media (prefers-reduced-motion) {
-  button {
+  .grow-on-hover:hover,
+  button:hover {
     transition: none;
   }
 }
