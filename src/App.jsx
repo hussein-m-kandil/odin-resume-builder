@@ -29,10 +29,17 @@ const focusTextEditor = (editCard) => {
   textEditors[textEditors.length - 1]?.focus();
 };
 
+const save = () => {
+  alert("Please check the print settings before printing/saving.");
+  print();
+};
+
 function App() {
   const [editMode, setEditMode] = useState(false);
 
   const [resumeEntries, setResumeEntries] = useState([]);
+
+  const [saveBtnClicked, setSaveBtnClicked] = useState(false);
 
   const generateEntryId = (entryCount) => `entry-${entryCount}`;
 
@@ -42,6 +49,15 @@ function App() {
 
   const handleDeleteEntry = (id) => {
     setResumeEntries((entries) => entries.filter((e) => e.id !== id));
+  };
+
+  const handleSave = () => {
+    if (editMode) {
+      handleToggleEditMode();
+      setSaveBtnClicked(true);
+    } else {
+      save();
+    }
   };
 
   /**
@@ -129,19 +145,31 @@ function App() {
     }
   }, [editMode]);
 
+  // Save the resume after exiting edit mode
+  useEffect(() => {
+    if (saveBtnClicked) {
+      setSaveBtnClicked(false);
+      // Save in clean callback to delay it as we can
+      return () => save();
+    }
+  }, [saveBtnClicked]);
+
   return (
     <AppDefaultsContext.Provider value={appDefaults}>
       <AppColorsContext.Provider value={appColors}>
         <EditModeContext.Provider value={editMode}>
-          <Header>
-            <ControlPanel
-              editMode={editMode}
-              onToggleEditMode={handleToggleEditMode}
-              onAddEntry={handleAddEntry}
-            />
-          </Header>
-          <div id={RESUME_CONTAINER_ID} style={{ padding: "1rem" }}>
-            {resumeEntries.map((re) => re.component)}
+          <div id="app-container">
+            <Header>
+              <ControlPanel
+                editMode={editMode}
+                onSave={handleSave}
+                onAddEntry={handleAddEntry}
+                onToggleEditMode={handleToggleEditMode}
+              />
+            </Header>
+            <div id={RESUME_CONTAINER_ID}>
+              {resumeEntries.map((re) => re.component)}
+            </div>
           </div>
         </EditModeContext.Provider>
       </AppColorsContext.Provider>
