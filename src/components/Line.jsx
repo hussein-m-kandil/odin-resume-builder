@@ -1,10 +1,6 @@
 import Entry from "./Entry";
 
-function Line({
-  initialStyle,
-  initialText = "New Line (needs your editing)",
-  ...props
-}) {
+function Line({ initialStyle, initialText = "New Line...", ...props }) {
   return (
     <Entry
       {...props}
