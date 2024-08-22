@@ -99,6 +99,7 @@ function ExtendedEntry({
             id={id}
             entryText={mainText}
             entryStyle={mainStyle}
+            entryPlaceholder={initialMainText}
             onChangeStyle={handleChangeMainStyle}
             onChangeText={handleChangeMainText}
             onDeleteEntry={handleDeleteEntry}
@@ -109,6 +110,7 @@ function ExtendedEntry({
             id={genExtensionId()}
             entryText={extensionText}
             entryStyle={extensionStyle}
+            entryPlaceholder={initialExtensionText}
             onChangeStyle={handleChangeExtensionStyle}
             onChangeText={handleChangeExtensionText}
             onDeleteEntry={handleDeleteEntry}

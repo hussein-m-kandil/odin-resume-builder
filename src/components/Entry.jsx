@@ -37,6 +37,7 @@ function Entry({
     id: id,
     entryText: text,
     entryStyle: style,
+    entryPlaceholder: initialText,
     editCardStyle: { margin: appDefaultsContext.editCardMargin },
     entryTextMaxLength: TEXT_MAX_LENGTH,
     onChangeStyle: handleChangeStyle,
