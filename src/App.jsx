@@ -35,7 +35,7 @@ function App() {
   const generateEntryId = (entryCount) => `entry-${entryCount}`;
 
   const handleToggleEditMode = () => {
-    setEditMode((iem) => !iem);
+    setEditMode((em) => !em);
   };
 
   const handleDeleteEntry = (id) => {
@@ -95,8 +95,6 @@ function App() {
     );
   }, []);
 
-  // TODO: Make the resume container a `from`, only in edit mode
-
   // Scroll to last added entry only right after addition
   const entriesCountRef = useRef(initialEntriesData.length);
   useEffect(() => {
@@ -113,6 +111,21 @@ function App() {
       focusLastEntry(resume);
     }
   }, [entriesCountRef, editMode, resumeEntries]);
+
+  // Submit edits on Enter key press
+  useEffect(() => {
+    if (editMode) {
+      const handleEntryKeyDown = (e) => {
+        if (e.key === "Enter") {
+          handleToggleEditMode();
+        }
+      };
+      document.addEventListener("keydown", handleEntryKeyDown);
+      return () => {
+        document.removeEventListener("keydown", handleEntryKeyDown);
+      };
+    }
+  }, [editMode]);
 
   return (
     <AppDefaultsContext.Provider value={appDefaults}>
