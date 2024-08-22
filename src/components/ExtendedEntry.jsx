@@ -102,7 +102,7 @@ function ExtendedEntry({
             entryPlaceholder={initialMainText}
             onChangeStyle={handleChangeMainStyle}
             onChangeText={handleChangeMainText}
-            onDeleteEntry={handleDeleteEntry}
+            deletable={false}
             {...props}
           />
           <EditCard
