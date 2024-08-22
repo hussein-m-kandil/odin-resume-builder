@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { initialEntriesData } from "./initialEntriesData";
-import { createEntryObject } from "./utils/createEntryObject";
+import { getInitialEntriesData } from "./utils/getInitialEntriesData";
 import { AppDefaultsContext } from "./context/AppDefaultsContext";
+import { createEntryObject } from "./utils/createEntryObject";
 import { AppColorsContext } from "./context/AppColorsContext";
 import { EditModeContext } from "./context/EditModeContext";
 import { appDefaults } from "./appDefaults";
@@ -10,6 +10,8 @@ import Header from "./components/Header";
 import ControlPanel from "./components/ControlPanel";
 
 const RESUME_CONTAINER_ID = "resume-container";
+
+const initialEntriesData = getInitialEntriesData();
 
 const focusLastEntry = (resume) => {
   let lastEntry = resume.lastChild;
