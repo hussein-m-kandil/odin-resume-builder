@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { AppColorsContext } from "../context/AppColorsContext";
 import Entry from "./Entry";
 
-function Head({ initialText = "New Headline (needs your editing)", ...props }) {
+function Head({ initialText = "New Headline...", ...props }) {
   const appColors = useContext(AppColorsContext);
   const initialStyle = {
     fontFamily: "sans-serif",
