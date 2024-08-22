@@ -13,6 +13,7 @@ function EditCard({
   onChangeText,
   editCardStyle,
   onDeleteEntry,
+  deletable = true,
   textAreaEditor = false,
   ...styleControlFlags
 }) {
@@ -29,25 +30,27 @@ function EditCard({
         ...editCardStyle,
       }}
     >
-      <button
-        aria-label="Delete"
-        style={{
-          padding: "0",
-          position: "absolute",
-          right: "0.5rem",
-          top: "0.5rem",
-          width: "1.5rem",
-          height: "1.5rem",
-          fontSize: "0.85rem",
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        onClick={() => onDeleteEntry(id)}
-      >
-        X
-      </button>
+      {deletable && (
+        <button
+          aria-label="Delete"
+          style={{
+            padding: "0",
+            position: "absolute",
+            right: "0.5rem",
+            top: "0.5rem",
+            width: "1.5rem",
+            height: "1.5rem",
+            fontSize: "0.85rem",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => onDeleteEntry(id)}
+        >
+          X
+        </button>
+      )}
       <StyleController
         id={id}
         styleObject={entryStyle}
