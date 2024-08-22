@@ -7,6 +7,7 @@ function EditCard({
   id,
   entryStyle,
   entryText,
+  entryPlaceholder,
   entryTextMaxLength,
   onChangeStyle,
   onChangeText,
@@ -56,6 +57,7 @@ function EditCard({
       <TextEditor
         id={id}
         text={entryText}
+        placeholder={entryPlaceholder}
         maxLength={entryTextMaxLength}
         style={entryStyle}
         onChange={onChangeText}
