@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { initialEntriesData } from "./initialEntriesData";
 import { createEntryObject } from "./utils/createEntryObject";
 import { AppDefaultsContext } from "./context/AppDefaultsContext";
@@ -10,6 +10,22 @@ import Header from "./components/Header";
 import ControlPanel from "./components/ControlPanel";
 
 const RESUME_CONTAINER_ID = "resume-container";
+
+const focusLastEntry = (resume) => {
+  let lastEntry = resume.lastChild;
+  if (lastEntry) {
+    const nodeName = lastEntry.nodeName;
+    if ((nodeName === "UL" || nodeName === "OL") && lastEntry.lastChild) {
+      lastEntry = lastEntry.lastChild;
+    }
+    lastEntry.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
+const focusTextEditor = (editCard) => {
+  const textEditors = editCard.querySelectorAll("input, textarea");
+  textEditors[textEditors.length - 1]?.focus();
+};
 
 function App() {
   const [editMode, setEditMode] = useState(false);
@@ -78,6 +94,25 @@ function App() {
       })
     );
   }, []);
+
+  // TODO: Make the resume container a `from`, only in edit mode
+
+  // Scroll to last added entry only right after addition
+  const entriesCountRef = useRef(initialEntriesData.length);
+  useEffect(() => {
+    const resume = document.getElementById(RESUME_CONTAINER_ID);
+    const entryAdded = resumeEntries.length > entriesCountRef.current;
+    if (resume && entryAdded) {
+      if (editMode) {
+        focusTextEditor(resume.lastChild);
+        // Current ref value on gets updated after entering the edit mode
+        return () => {
+          entriesCountRef.current = resumeEntries.length;
+        };
+      }
+      focusLastEntry(resume);
+    }
+  }, [entriesCountRef, editMode, resumeEntries]);
 
   return (
     <AppDefaultsContext.Provider value={appDefaults}>
