@@ -4,9 +4,10 @@ import { AppColorsContext } from "../context/AppColorsContext";
 function TextEditor({
   id,
   text,
-  maxLength,
   style,
   onChange,
+  maxLength,
+  placeholder,
   textAreaInput = false,
 }) {
   const appColors = useContext(AppColorsContext);
@@ -15,20 +16,28 @@ function TextEditor({
     id: `${id}-editor`,
     maxLength,
     value: text,
-    placeholder: "Edit entry...",
+    placeholder: placeholder || "Edit entry...",
     onChange: onChange,
   };
 
   const commonStyle = {
     ...style,
-    width: "100%",
-    marginTop: "0",
-    marginRight: "0",
-    marginBottom: "0",
-    marginLeft: "0",
-    padding: "0.75rem",
     display: "block",
+    padding: "0.75rem",
+    marginBottom: "0",
+    marginRight: "0",
+    marginLeft: "0",
+    marginTop: "0",
+    width: "100%",
+    backgroundColor: "#ffffff",
   };
+
+  if (!text) {
+    commonStyle.fontWeight = "lighter";
+    commonStyle.fontStyle = "italic";
+    commonStyle.fontSize = "small";
+    commonStyle.color = "#eeeeee";
+  }
 
   return (
     <div
@@ -37,7 +46,7 @@ function TextEditor({
         position: "relative",
       }}
     >
-      <label htmlFor={customProps.id} title="Entry editor">
+      <label htmlFor={customProps.id}>
         {textAreaInput ? (
           <textarea
             {...customProps}
