@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import { useWindowInnerWidth } from "../hooks/useWindowInnerWidth";
 import { AppColorsContext } from "../context/AppColorsContext";
 import Paragraph from "./Paragraph";
 import SubHead from "./SubHead";
@@ -9,10 +8,8 @@ import Line from "./Line";
 import Date from "./Date";
 import Head from "./Head";
 
-function ControlPanel({ editMode, onToggleEditMode, onAddEntry }) {
+function ControlPanel({ editMode, onToggleEditMode, onAddEntry, onSave }) {
   const appColors = useContext(AppColorsContext);
-
-  const viewWidth = useWindowInnerWidth();
 
   const [entryTypeIndex, setEntryTypeIndex] = useState(0);
 
@@ -37,11 +34,11 @@ function ControlPanel({ editMode, onToggleEditMode, onAddEntry }) {
     backgroundColor: appColors.lightAccent,
     color: appColors.accent,
     border: "none",
-    minWidth: "5rem",
-    fontSize: "large",
+    fontSize: "small",
     fontWeight: "bold",
+    minWidth: "3.5rem",
     textAlign: "center",
-    padding: "0.25rem 0.5rem",
+    padding: "0.5rem 0.25rem",
     boxShadow: "0 0 2px 0 #0007",
   };
 
@@ -49,9 +46,9 @@ function ControlPanel({ editMode, onToggleEditMode, onAddEntry }) {
     <div
       style={{
         display: "flex",
-        gap: "0.75rem",
-        justifyContent: "end",
-        flexDirection: viewWidth < 400 ? "column" : "row",
+        gap: "0.5rem",
+        flexWrap: "wrap",
+        justifyContent: "center",
       }}
     >
       <Select
@@ -73,6 +70,9 @@ function ControlPanel({ editMode, onToggleEditMode, onAddEntry }) {
       </button>
       <button type="button" style={controllersStyle} onClick={onToggleEditMode}>
         {editMode ? "Submit" : "Edit"}
+      </button>
+      <button type="button" style={controllersStyle} onClick={onSave}>
+        Save
       </button>
     </div>
   );
