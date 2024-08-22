@@ -36,13 +36,13 @@ function ExtendedEntry({
   const isValidLength = (text) => text.length <= TEXT_MAX_LENGTH;
 
   const handleChangeMainText = (e) => {
-    if (isValidLength(e.targe.value)) {
+    if (isValidLength(e.target.value)) {
       setMainText(() => e.target.value);
     }
   };
 
   const handleChangeExtensionText = (e) => {
-    if (isValidLength(e.targe.value)) {
+    if (isValidLength(e.target.value)) {
       setExtensionText(() => e.target.value);
     }
   };
