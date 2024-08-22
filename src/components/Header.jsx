@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { AppColorsContext } from "../context/AppColorsContext";
 import useWindowInnerWidth from "../hooks/useWindowInnerWidth";
 
-const BREAK_POINT = 800;
+const BREAK_POINT = 720;
 
 function Header({ children }) {
   const appColors = useContext(AppColorsContext);
@@ -22,8 +22,8 @@ function Header({ children }) {
     >
       <div
         style={{
+          padding: "0.5rem 1rem",
           margin: "0 auto",
-          padding: "1rem",
           display: "flex",
           flex: "1",
           gap: "1rem",
@@ -34,8 +34,10 @@ function Header({ children }) {
       >
         <h1
           style={{
-            color: appColors.light,
             margin: "0",
+            fontWeight: "bold",
+            fontSize: "xx-large",
+            color: appColors.light,
             textAlign: viewWidth < BREAK_POINT ? "center" : "left",
           }}
         >
