@@ -13,6 +13,8 @@ html {
 
 body {
   margin: 0;
+  width: 100%;
+  background-color: #ddd;
 }
 
 textarea,
@@ -43,13 +45,39 @@ button {
   -webkit-tap-highlight-color: transparent;
   -webkit-appearance: none;
   appearance: none;
-  font-size: medium;
+  font-size: small;
   font-weight: bold;
   padding: 0.5rem 1rem;
 }
 
 button:active {
   filter: invert();
+}
+
+#resume-container {
+  margin: 1.5rem auto;
+  padding: 2.5rem;
+  max-width: 21cm;
+  min-height: 29.7cm;
+  background-color: #fff;
+}
+
+@media screen and (width < 22cm) {
+  #resume-container {
+    margin: 1rem auto;
+  }
+}
+
+@media screen and (width < 21.5cm) {
+  #resume-container {
+    margin: 0.5rem auto;
+  }
+}
+
+@media screen and (width < 21cm) {
+  #resume-container {
+    margin: 0 auto;
+  }
 }
 
 @media (pointer: fine) {
@@ -64,5 +92,16 @@ button:active {
   .grow-on-hover:hover,
   button:hover {
     transition: none;
+  }
+}
+
+@media print {
+  #app-container > * {
+    display: none;
+  }
+
+  #app-container > #resume-container {
+    display: block;
+    padding: 0;
   }
 }
