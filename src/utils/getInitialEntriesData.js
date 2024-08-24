@@ -1,6 +1,6 @@
 import { initialData } from "../data/initialData";
-import { appDefaults } from "../appDefaults";
-import { appColors } from "../appColors";
+import { appDefaults } from "../data/appDefaults";
+import { appColors } from "../data/appColors";
 import Head from "../components/Head";
 import Line from "../components/Line";
 import Date from "../components/Date";

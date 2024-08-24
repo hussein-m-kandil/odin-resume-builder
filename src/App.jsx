@@ -4,8 +4,8 @@ import { AppDefaultsContext } from "./context/AppDefaultsContext";
 import { createEntryObject } from "./utils/createEntryObject";
 import { AppColorsContext } from "./context/AppColorsContext";
 import { EditModeContext } from "./context/EditModeContext";
-import { appDefaults } from "./appDefaults";
-import { appColors } from "./appColors";
+import { appDefaults } from "./data/appDefaults";
+import { appColors } from "./data/appColors";
 import Header from "./components/Header";
 import ControlPanel from "./components/ControlPanel";
 
