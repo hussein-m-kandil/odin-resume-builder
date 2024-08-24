@@ -6,6 +6,7 @@ import FontFamilyController from "./FontFamilyController";
 import FontStyleController from "./FontStyleController";
 import FontSizeController from "./FontSizeController";
 import ColorController from "./ColorController";
+import TextAlignController from "./TextAlignController";
 
 function StyleController({
   id,
@@ -16,6 +17,7 @@ function StyleController({
   withFontStyleController = true,
   withFontFamilyController = true,
   withMarginBottomController = true,
+  withTextAlignController = true,
 }) {
   const appColors = useContext(AppColorsContext);
   const appDefaultsContext = useContext(AppDefaultsContext);
@@ -71,6 +73,9 @@ function StyleController({
         <FontFamilyController {...commonControlProps} />
       )}
       {withFontSizeController && <FontSizeController {...commonControlProps} />}
+      {withTextAlignController && (
+        <TextAlignController {...commonControlProps} />
+      )}
       {withFontStyleController && (
         <FontStyleController
           id={id}

@@ -68,8 +68,20 @@ function ExtendedEntry({
     onDeleteEntry(id);
   };
 
+  const justifyFromAlign = (s) => {
+    switch (s.textAlign) {
+      case "center":
+        return "center";
+      case "right":
+        return "end";
+      default:
+        return "start";
+    }
+  };
+
   const containerStyle = {
     display: "flex",
+    justifyContent: justifyFromAlign(mainStyle),
     flexWrap: windowInnerWidth < 480 ? "wrap" : "nowrap",
     gap: `${editMode ? "1rem" : "0.5rem"}`,
   };
@@ -109,7 +121,7 @@ function ExtendedEntry({
             {...editCardCommonProps}
             id={genExtensionId()}
             entryText={extensionText}
-            entryStyle={extensionStyle}
+            entryStyle={{ ...extensionStyle, textAlign: mainStyle.textAlign }}
             entryPlaceholder={initialExtensionText}
             onChangeStyle={handleChangeExtensionStyle}
             onChangeText={handleChangeExtensionText}
@@ -117,12 +129,13 @@ function ExtendedEntry({
             withMarginBottomController={false}
             withFontFamilyController={false}
             withFontSizeController={false}
+            withTextAlignController={false}
             {...props}
           />
         </>
       ) : (
         <>
-          <div style={mainStyle}>{mainText}</div>
+          <div style={{ ...mainStyle, textAlign: undefined }}>{mainText}</div>
           {initialExtensionText && (
             <>
               {!editMode && <div style={extensionStyle}>-</div>}

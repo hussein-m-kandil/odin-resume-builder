@@ -55,7 +55,7 @@ function List({
     );
   });
 
-  const listStyle = { margin: "0" };
+  const listStyle = { margin: "0", listStylePosition: "inside" };
 
   if (editMode) {
     listStyle.padding = "0";
