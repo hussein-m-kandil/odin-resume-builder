@@ -34,11 +34,11 @@ function ControlPanel({ editMode, onToggleEditMode, onAddEntry, onSave }) {
     backgroundColor: appColors.lightAccent,
     color: appColors.accent,
     border: "none",
-    fontSize: "small",
+    fontSize: "medium",
     fontWeight: "bold",
     minWidth: "3.5rem",
     textAlign: "center",
-    padding: "0.5rem 0.25rem",
+    padding: "0.35rem 0.25rem",
     boxShadow: "0 0 2px 0 #0007",
   };
 
@@ -51,6 +51,9 @@ function ControlPanel({ editMode, onToggleEditMode, onAddEntry, onSave }) {
         justifyContent: "center",
       }}
     >
+      <button type="button" style={controllersStyle} onClick={onSave}>
+        Save
+      </button>
       <Select
         className={"grow-on-hover"}
         id={"entry-types-select"}
@@ -70,9 +73,6 @@ function ControlPanel({ editMode, onToggleEditMode, onAddEntry, onSave }) {
       </button>
       <button type="button" style={controllersStyle} onClick={onToggleEditMode}>
         {editMode ? "Submit" : "Edit"}
-      </button>
-      <button type="button" style={controllersStyle} onClick={onSave}>
-        Save
       </button>
     </div>
   );
