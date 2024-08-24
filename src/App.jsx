@@ -20,7 +20,7 @@ const focusLastEntry = (resume) => {
     if ((nodeName === "UL" || nodeName === "OL") && lastEntry.lastChild) {
       lastEntry = lastEntry.lastChild;
     }
-    lastEntry.scrollIntoView({ behavior: "smooth" });
+    lastEntry.scrollIntoView(false);
   }
 };
 
