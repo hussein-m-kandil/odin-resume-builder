@@ -9,6 +9,9 @@ import { appColors } from "./data/appColors";
 import Header from "./components/Header";
 import ControlPanel from "./components/ControlPanel";
 
+const GF_KEY = import.meta.env.VITE_GF_KEY;
+const GF_API_URL = `https://www.googleapis.com/webfonts/v1/webfonts?key=${GF_KEY}&sort=alpha`;
+
 const RESUME_CONTAINER_ID = "resume-container";
 
 const initialEntriesData = getInitialEntriesData();
@@ -35,6 +38,8 @@ const save = () => {
 };
 
 function App() {
+  const [googleFonts, setGoogleFonts] = useState(null);
+
   const [editMode, setEditMode] = useState(false);
 
   const [resumeEntries, setResumeEntries] = useState([]);
@@ -154,8 +159,31 @@ function App() {
     }
   }, [saveBtnClicked]);
 
+  // Fetch all google font families
+  useEffect(() => {
+    if (!googleFonts || !googleFonts.items) {
+      fetch(GF_API_URL, { mode: "cors" })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw response;
+        })
+        .then((data) => {
+          console.log("%cReceived google fonts: ", "color: orange", data);
+          setGoogleFonts(data);
+        })
+        .catch((error) => console.log(error));
+      console.log("%cFetching google fonts...", "color: orange");
+    }
+  }, [googleFonts]);
+
+  const googleFontFamilies = googleFonts?.items.map((f) => f.family);
+
   return (
-    <AppDefaultsContext.Provider value={appDefaults}>
+    <AppDefaultsContext.Provider
+      value={{ ...appDefaults, googleFonts, googleFontFamilies }}
+    >
       <AppColorsContext.Provider value={appColors}>
         <EditModeContext.Provider value={editMode}>
           <div id="app-container">
