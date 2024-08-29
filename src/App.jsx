@@ -116,6 +116,11 @@ function App() {
         );
       })
     );
+    // Alert before unload the page if it contains user edits
+    window.addEventListener("beforeunload", (e) => {
+      e.preventDefault();
+      event.returnValue = true; // Just in case ;)
+    });
   }, []);
 
   // Scroll to last added entry only right after addition
